@@ -4,7 +4,7 @@ A full-stack real-time video conferencing application inspired by Zoom, built us
 
 ---
 
-🚀 **Live Demo:** https://real-time-video-conferencing-platform-de4t.onrender.com
+🌐 **Live Application:** https://real-time-video-conferencing-platform-de4t.onrender.com
 
 ## 🚀 Features
 

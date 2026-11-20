@@ -26,6 +26,8 @@ export default function VideoMeetComponent() {
     }, []);
     const localStreamRef = useRef(null);
     const screenStreamRef = useRef(null);
+    const mediaRequestRef = useRef(null);
+    const mountedRef = useRef(false);
     const peersRef = useRef(new Map());
     const screenAudioSendersRef = useRef(new Map());
     const remoteStreamsRef = useRef(new Map());
@@ -71,10 +73,51 @@ export default function VideoMeetComponent() {
         screenStreamRef.current = null;
     }, []);
 
+    const ensureLocalMedia = useCallback(() => {
+        if (localStreamRef.current) return Promise.resolve(localStreamRef.current);
+        if (mediaRequestRef.current) return mediaRequestRef.current;
+
+        const request = (async () => {
+            try {
+                return await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+            } catch (captureError) {
+                try {
+                    return await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
+                } catch (videoError) {
+                    return navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                }
+            }
+        })();
+
+        const sharedRequest = request.then(stream => {
+            if (!mountedRef.current) {
+                stream.getTracks().forEach(track => track.stop());
+                throw new Error('Meeting media request was cancelled.');
+            }
+            localStreamRef.current = stream;
+            return stream;
+        }).finally(() => {
+            if (mediaRequestRef.current === sharedRequest) mediaRequestRef.current = null;
+        });
+        mediaRequestRef.current = sharedRequest;
+        return sharedRequest;
+    }, []);
+
     useEffect(() => {
         setScreenAvailable(Boolean(navigator.mediaDevices?.getDisplayMedia));
-        return cleanup;
-    }, [cleanup]);
+        mountedRef.current = true;
+        ensureLocalMedia().then(stream => {
+            setVideoOn(stream.getVideoTracks().length > 0);
+            setAudioOn(stream.getAudioTracks().length > 0);
+            if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+        }).catch(() => {
+            if (mountedRef.current) setError('Allow camera or microphone access to preview and join.');
+        });
+        return () => {
+            mountedRef.current = false;
+            cleanup();
+        };
+    }, [cleanup, ensureLocalMedia]);
 
     const addPeer = useCallback((peerId, shouldOffer) => {
         if (peerId === socketRef.current?.id || peersRef.current.has(peerId)) return peersRef.current.get(peerId);
@@ -145,22 +188,10 @@ export default function VideoMeetComponent() {
         if (!displayName || !roomId.trim()) { setError('Enter a name to join.'); return; }
         setError('');
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-            localStreamRef.current = stream;
-            if (localVideoRef.current) localVideoRef.current.srcObject = stream;
-        } catch (e) {
-            try {
-                localStreamRef.current = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
-                if (localVideoRef.current) localVideoRef.current.srcObject = localStreamRef.current;
-                setAudioOn(false);
-            } catch (videoError) {
-                try {
-                    localStreamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-                    if (localVideoRef.current) localVideoRef.current.srcObject = localStreamRef.current;
-                    setVideoOn(false);
-                } catch (audioError) { setError('Allow microphone or camera access to join the meeting.'); return; }
-            }
-        }
+            const stream = await ensureLocalMedia();
+            setVideoOn(stream.getVideoTracks().length > 0);
+            setAudioOn(stream.getAudioTracks().length > 0);
+        } catch (mediaError) { setError('Allow camera or microphone access to join the meeting.'); return; }
         const socket = io(server, { transports: ['websocket', 'polling'] });
         socketRef.current = socket;
         socket.on('connect', () => socket.emit('join-call', roomId));

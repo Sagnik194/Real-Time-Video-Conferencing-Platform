@@ -94,6 +94,21 @@ beforeEach(() => {
     io.mockReset();
 });
 
+test('lobby attaches the camera preview before the user joins', async () => {
+    const stream = makeStream(makeTrack('video'), makeTrack('audio'));
+    Object.defineProperty(navigator, 'mediaDevices', {
+        configurable: true,
+        value: { getUserMedia: jest.fn(async () => stream), getDisplayMedia: jest.fn() },
+    });
+
+    render(<MemoryRouter initialEntries={['/room-test']}>
+        <Routes><Route path='/:url' element={<VideoMeetComponent />} /></Routes>
+    </MemoryRouter>);
+
+    await waitFor(() => expect(document.querySelector('video').srcObject).toBe(stream));
+    expect(io).not.toHaveBeenCalled();
+});
+
 test('camera and microphone toggles change only their own tracks', async () => {
     const camera = makeTrack('video');
     const microphone = makeTrack('audio');

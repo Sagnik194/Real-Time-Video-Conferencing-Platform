@@ -52,9 +52,20 @@ test('authenticated dashboard and meeting history routes remain connected', asyn
     await screen.findByText(/no meetings yet/i);
 });
 
-test('meeting route opens its lobby before media capture starts', () => {
+test('meeting route opens its lobby with a live camera preview before joining', async () => {
+    const videoTrack = { kind: 'video', stop: jest.fn() };
+    const previewStream = {
+        getTracks: () => [videoTrack],
+        getVideoTracks: () => [videoTrack],
+        getAudioTracks: () => [],
+    };
+    Object.defineProperty(navigator, 'mediaDevices', {
+        configurable: true,
+        value: { getUserMedia: jest.fn(async () => previewStream), getDisplayMedia: jest.fn() },
+    });
     openRoute('/room-check');
     expect(screen.getByRole('heading', { name: /join the conversation/i })).toBeInTheDocument();
     expect(screen.getByLabelText('Your name')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Join meeting' })).toBeInTheDocument();
+    await waitFor(() => expect(document.querySelector('video').srcObject).toBe(previewStream));
 });

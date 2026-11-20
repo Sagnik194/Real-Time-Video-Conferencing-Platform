@@ -14,7 +14,7 @@ function HomeComponent() {
     const [error, setError] = useState("");
 
 
-    const {addToUserHistory} = useContext(AuthContext);
+    const {addToUserHistory, handleLogout} = useContext(AuthContext);
     let handleJoinVideoCall = async () => {
         const code = meetingCode.trim();
         if (!code) { setError("Enter a meeting code to join."); return; }
@@ -46,9 +46,9 @@ function HomeComponent() {
                     </IconButton>
                     <p>History</p>
 
-                    <Button onClick={() => {
-                        localStorage.removeItem("token")
-                        navigate("/auth")
+                    <Button onClick={async () => {
+                        try { await handleLogout(); } catch { /* The local token is still cleared by handleLogout. */ }
+                        navigate("/auth");
                     }}>
                         Logout
                     </Button>

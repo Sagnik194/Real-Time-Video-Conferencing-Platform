@@ -5,8 +5,9 @@ import { User } from '../models/user.model.js';
 import { Meeting } from '../models/meeting.model.js';
 
 const validText = (value, max) => typeof value === 'string' && value.trim().length > 0 && value.trim().length <= max;
+const sessionTtlHours = Math.min(720, Math.max(1, Number(process.env.SESSION_TTL_HOURS) || 24));
 const serverError = (res, error) => {
-    console.error(error);
+    console.error('Request failed:', error?.name || 'Error');
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: 'An unexpected error occurred.' });
 };
 
@@ -17,6 +18,7 @@ const login = async (req, res) => {
         const user = await User.findOne({ username: username.trim() });
         if (!user || !(await bcrypt.compare(password, user.password))) return res.status(httpStatus.UNAUTHORIZED).json({ message: 'Invalid username or password.' });
         user.token = crypto.randomBytes(32).toString('hex');
+        user.tokenExpiresAt = new Date(Date.now() + sessionTtlHours * 60 * 60 * 1000);
         await user.save();
         return res.status(httpStatus.OK).json({ token: user.token });
     } catch (error) { return serverError(res, error); }
@@ -40,14 +42,36 @@ const register = async (req, res) => {
 };
 
 const getAuthenticatedUser = async (req, res) => {
-    const token = req.get('authorization')?.replace(/^Bearer\s+/i, '') || req.query.token || req.body?.token;
+    const token = req.get('authorization')?.replace(/^Bearer\s+/i, '') || req.body?.token;
     if (!validText(token, 256)) {
         res.status(httpStatus.UNAUTHORIZED).json({ message: 'Authentication required.' });
         return null;
     }
     const user = await User.findOne({ token });
     if (!user) res.status(httpStatus.UNAUTHORIZED).json({ message: 'Session expired. Please sign in again.' });
+    else if (user.tokenExpiresAt && user.tokenExpiresAt.getTime() <= Date.now()) {
+        user.token = undefined;
+        user.tokenExpiresAt = undefined;
+        await user.save();
+        res.status(httpStatus.UNAUTHORIZED).json({ message: 'Session expired. Please sign in again.' });
+        return null;
+    } else if (!user.tokenExpiresAt) {
+        // Existing sessions are migrated on first use and receive a bounded lifetime.
+        user.tokenExpiresAt = new Date(Date.now() + sessionTtlHours * 60 * 60 * 1000);
+        await user.save();
+    }
     return user;
+};
+
+const logout = async (req, res) => {
+    try {
+        const user = await getAuthenticatedUser(req, res);
+        if (!user) return;
+        user.token = undefined;
+        user.tokenExpiresAt = undefined;
+        await user.save();
+        return res.status(httpStatus.OK).json({ message: 'Signed out.' });
+    } catch (error) { return serverError(res, error); }
 };
 
 const getUserHistory = async (req, res) => {
@@ -70,4 +94,4 @@ const addToHistory = async (req, res) => {
     } catch (error) { return serverError(res, error); }
 };
 
-export { login, register, getUserHistory, addToHistory };
+export { login, register, logout, getUserHistory, addToHistory };

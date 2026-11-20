@@ -16,6 +16,7 @@ const server = createServer(app);
 connectToSocket(server);
 
 app.set("port", process.env.PORT || 8000);
+app.set('trust proxy', 1);
 
 const defaultOrigins = ['https://real-time-video-conferencing-platform-de4t.onrender.com', 'http://localhost:3000'];
 const allowedOrigins = (process.env.CLIENT_ORIGIN || defaultOrigins.join(',')).split(',').map(value => value.trim()).filter(Boolean);
@@ -29,7 +30,7 @@ app.use("/api/v1/users", userRoutes);
 
 app.use((req, res) => res.status(404).json({ message: 'Route not found.' }));
 app.use((error, _req, res, _next) => {
-    console.error(error);
+    console.error('Request failed:', error?.name || 'Error');
     res.status(error.status || 500).json({ message: error.status && error.status < 500 ? error.message : 'An unexpected error occurred.' });
 });
 
@@ -58,8 +59,7 @@ const start = async () => {
         });
 
     } catch (error) {
-        console.error("MongoDB connection failed:");
-        console.error(error);
+        console.error('MongoDB connection failed:', error?.name || 'Error');
         process.exit(1);
     }
 };

@@ -61,6 +61,14 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
+    const handleLogout = async () => {
+        try {
+            return await client.post('/logout');
+        } finally {
+            localStorage.removeItem('token');
+        }
+    }
+
     const getHistoryOfUser = async () => {
         try {
             let request = await client.get("/get_all_activity");
@@ -82,7 +90,7 @@ export const AuthProvider = ({ children }) => {
 
 
     const data = {
-        userData, setUserData, addToUserHistory, getHistoryOfUser, handleRegister, handleLogin
+        userData, setUserData, addToUserHistory, getHistoryOfUser, handleRegister, handleLogin, handleLogout
     }
 
     return (

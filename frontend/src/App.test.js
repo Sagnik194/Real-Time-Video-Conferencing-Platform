@@ -14,6 +14,6 @@ jest.mock('axios', () => ({
 
 test('renders the video conferencing landing page', () => {
   render(<App />);
-  expect(screen.getByText(/connect/i)).toBeInTheDocument();
+  expect(screen.getByText('Smeet')).toBeInTheDocument();
   expect(screen.getByText(/get started/i)).toBeInTheDocument();
 });

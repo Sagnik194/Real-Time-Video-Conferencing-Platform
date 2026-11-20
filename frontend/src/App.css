@@ -1,96 +1,108 @@
-.landingPageContainer {
-  width: 100vw;
-  height: 100vh;
-  background: url("/public/background.png");
-  background-repeat: no-repeat;
-  background-size: cover;
-  color: white;
-}
+.smeet-brand { display: inline-flex; align-items: center; gap: 10px; color: inherit; font-size: 1.45rem; font-weight: 800; letter-spacing: -0.055em; text-decoration: none; }
+.smeet-brand img { display: block; width: 38px; height: 38px; }
+.smeet-brand--large { font-size: 1.7rem; }
+.smeet-brand--large img { width: 46px; height: 46px; }
 
-.landingPageContainer nav {
-  padding-inline: 1.2rem;
-  padding-block: 1.6rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.landingPageContainer { min-height: 100vh; overflow: hidden; color: #202124; background: radial-gradient(ellipse at 84% 45%, #ffe8e5 0, rgba(255,232,229,.5) 25%, transparent 48%), #fff; }
+.landingPageContainer nav { height: 82px; max-width: 1240px; margin: 0 auto; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; }
+.landingPageContainer .navlist { display: flex; align-items: center; gap: 12px; }
+.landingPageContainer .navlist button { border: 0; background: transparent; color: #3c4043; padding: 11px 16px; font: inherit; font-weight: 650; cursor: pointer; border-radius: 999px; }
+.landingPageContainer .navlist button:hover { background: #f7f7f7; }
+.landingPageContainer .navlist .nav-primary { background: #e62117; color: white; padding-inline: 22px; box-shadow: 0 5px 14px #e621172b; }
+.landingPageContainer .navlist .nav-primary:hover { background: #c91c14; }
+.landingMainContainer { max-width: 1240px; min-height: min(760px, calc(100vh - 82px)); margin: 0 auto; padding: 60px 32px 80px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 56px; }
+.landing-copy { position: relative; z-index: 1; }
+.eyebrow { display: inline-flex; align-items: center; gap: 9px; color: #e62117; font-size: .82rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.eyebrow::before { content: ''; width: 26px; height: 2px; background: currentColor; }
+.landing-copy h1 { margin: 22px 0 18px; max-width: 680px; font-size: clamp(3rem, 6vw, 5.5rem); line-height: 1.03; letter-spacing: -.065em; font-weight: 780; }
+.landing-copy h1 span { color: #e62117; }
+.landing-copy > p { max-width: 480px; color: #686b70; font-size: 1.15rem; line-height: 1.75; }
+.landing-actions { display: flex; align-items: center; gap: 18px; margin-top: 34px; }
+.landing-actions a, .landing-actions button { display: inline-flex; justify-content: center; align-items: center; min-height: 52px; border: 0; border-radius: 12px; padding: 0 23px; background: #e62117; box-shadow: 0 8px 20px #e621172b; color: white; text-decoration: none; font: inherit; font-weight: 750; cursor: pointer; transition: transform .18s, background .18s; }
+.landing-actions a:hover, .landing-actions button:hover { transform: translateY(-2px); background: #c91c14; }
+.landing-note { display: flex; align-items: center; gap: 9px; margin-top: 28px; color: #74777c; font-size: .9rem; }
+.landing-note span { color: #e62117; font-weight: 900; }
+.landing-art { position: relative; display: flex; min-height: 480px; align-items: center; justify-content: center; }
+.landing-art::before { content: ''; position: absolute; width: min(35vw, 430px); aspect-ratio: 1; border-radius: 50%; background: linear-gradient(140deg,#fce5e3,#fff4f2); }
+.landing-art img { position: relative; width: min(100%, 520px); max-height: 590px; object-fit: contain; filter: drop-shadow(0 26px 35px #58231c20); }
 
-}
+.navBar { height: 76px; display: flex; align-items: center; justify-content: space-between; padding: 0 clamp(20px, 5vw, 72px); background: #fff; border-bottom: 1px solid #ececec; }
+.navBar > div:first-child { display: flex; align-items: center; }
+.navBar .smeet-brand { color: #202124; }
+.nav-actions { display: flex; align-items: center; gap: 8px; }
+.nav-actions .nav-history { color: #565a5f; font-weight: 650; }
+.nav-actions .nav-logout { color: #e62117; border: 1px solid #f2b7b3; border-radius: 999px; padding: 7px 18px; }
+.meetContainer { width: min(1180px, calc(100% - 48px)); min-height: calc(100vh - 76px); margin: auto; padding: 50px 0; display: grid; grid-template-columns: 1fr .8fr; align-items: center; gap: 44px; }
+.leftPanel { display: flex; align-items: center; }
+.leftPanel > div { width: 100%; max-width: 590px; }
+.home-eyebrow { color: #e62117; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; font-size: .78rem; }
+.leftPanel h2 { margin: 14px 0 28px; font-size: clamp(2.2rem, 4.3vw, 4rem); line-height: 1.12; letter-spacing: -.05em; color: #202124; }
+.leftPanel h2 span { color: #e62117; }
+.join-meeting-form { display: flex; align-items: flex-start; gap: 12px; }
+.join-meeting-form .MuiTextField-root { flex: 1; }
+.join-meeting-form .MuiOutlinedInput-root { border-radius: 12px; background: white; }
+.join-meeting-form .MuiButton-root { height: 56px; border-radius: 12px; padding-inline: 26px; background: #e62117; text-transform: none; font-weight: 750; }
+.join-meeting-form .MuiButton-root:hover { background: #c91c14; }
+.join-error { min-height: 24px; padding: 8px 4px; color: #b3261e; font-size: .9rem; }
+.home-points { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 25px; color: #70757a; font-size: .88rem; }
+.home-points span::before { content: '✓'; color: #e62117; margin-right: 7px; font-weight: 800; }
+.rightPanel { display: flex; align-items: center; justify-content: center; min-height: 420px; padding: 30px; border-radius: 28px; background: radial-gradient(circle at 50% 48%, #fee9e6 0, #fff6f5 42%, #fff 72%); }
+.rightPanel > img { width: min(100%, 410px); height: auto; border-radius: 24px; object-fit: contain; }
 
-.landingPageContainer nav h2 {
-  font-size: 1.8rem;
-  font-weight: 500;
-}
+.history-page { min-height: 100vh; padding: 0 24px 60px; background: #f8f8f8; }
+.history-header { width: min(920px, 100%); height: 76px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+.history-header .MuiIconButton-root { color: #e62117; background: white; }
+.history-header h1 { color: #202124; font-size: 1.35rem; letter-spacing: -.025em; }
+.history-content { width: min(920px, 100%); margin: 30px auto; }
+.history-intro { margin-bottom: 22px; color: #73777c; }
+.history-list { display: grid; gap: 12px; }
+.history-card.MuiCard-root { border: 1px solid #ececec; border-radius: 16px; box-shadow: 0 4px 15px #00000006; }
+.history-card .MuiCardContent-root { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px 24px; }
+.history-code.MuiTypography-root { color: #25282c; font-weight: 750; }
+.history-date.MuiTypography-root { color: #777b80; }
+.history-empty { padding: 42px; text-align: center; border: 1px dashed #dedede; border-radius: 18px; color: #74777c; background: white; }
 
-.landingPageContainer nav .navlist {
-  display: flex;
-  gap: 1.6rem;
-  cursor: pointer;
+.auth-page { background: #fff; }
+.auth-showcase.MuiGrid-item { min-height: 100vh; color: #fff; background: radial-gradient(circle at 70% 40%, #f44a40 0, #e62117 42%, #b91610 100%); }
+.auth-showcase .smeet-brand { color: white; }
+.auth-showcase-copy { max-width: 600px; }
+.auth-showcase-copy .eyebrow { color: #ffe2df; }
+.auth-showcase-copy h1 { margin: 18px 0; font-size: clamp(2.8rem, 5vw, 4.8rem); line-height: 1.03; letter-spacing: -.06em; }
+.auth-showcase-copy p { max-width: 430px; color: #ffe7e5; font-size: 1.08rem; line-height: 1.65; }
+.auth-showcase-copy img { display: block; width: min(100%, 480px); height: 190px; margin-top: 20px; object-fit: contain; object-position: left center; filter: drop-shadow(0 18px 24px #5d090950); }
+.auth-showcase-foot { color: #ffe2df; font-size: .84rem; }
+.auth-form-panel.MuiGrid-item { display: flex; align-items: center; }
+.auth-form-panel .MuiBox-root { width: 100%; }
+.auth-mobile-brand { display: none; margin-bottom: 20px; }
+.auth-heading { margin: 10px 0 5px; color: #202124; text-align: center; font-size: 1.75rem; letter-spacing: -.04em; }
+.auth-subheading { margin-bottom: 22px; color: #74777c; text-align: center; font-size: .93rem; }
+.auth-form-panel .MuiButton-root { text-transform: none; font-weight: 700; }
+.auth-form-panel .MuiTextField-root .MuiOutlinedInput-root { border-radius: 11px; }
 
-}
-
-.landingMainContainer {
-  display: flex;
-  justify-content: space-between;
-  padding-inline: 3rem;
-  height: 80vh;
-  align-items: center;
-}
-
-.landingMainContainer>div:nth-child(1) {
-  font-size: 2.2rem;
-}
-
-.landingMainContainer>div:nth-child(1) div[role='button'] {
-  background: #D97500;
-  width: fit-content;
-  padding: 1rem;
-  border-radius: 20px;
-  margin-top: 1.9rem;
-}
-
-.landingMainContainer>div:nth-child(1) div[role='button'] a {
-  text-decoration: none;
-  color: white;
-  font-size: 1.7rem;
-}
-
-.landingMainContainer>div:nth-child(2) img {
-  height: 70vh;
-  width: auto;
-}
-
-.navBar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-inline: 20px;
-  text-align: center;
-
-}
-.meetContainer {
-  display: flex;
-  padding-inline: 20px;
-  height: 80vh;
-  gap: 10vw;
-  justify-content: center;
-}
-
-
-
-.leftPanel {
-  height: 100%;
-  display: flex;
-  align-items: center;
-
-}
-
-.rightPanel {
-  display: flex;
-  align-items: center;
-}
-
-.rightPanel > img {
-  width: 30vw;
-  height: auto;
-  border-radius: 20px;
+@media (max-width: 760px) {
+  .landingPageContainer nav { height: 70px; padding-inline: 18px; }
+  .landingPageContainer .navlist { gap: 2px; }
+  .landingPageContainer .navlist button { padding: 9px 10px; font-size: .9rem; }
+  .landingPageContainer .smeet-brand { gap: 7px; font-size: 1.2rem; }
+  .landingPageContainer .smeet-brand img { width: 32px; height: 32px; }
+  .landingMainContainer { min-height: auto; grid-template-columns: 1fr; gap: 10px; padding: 70px 24px 40px; }
+  .landing-copy h1 { font-size: clamp(3rem, 13vw, 4.5rem); }
+  .landing-copy > p { font-size: 1rem; }
+  .landing-art { min-height: 300px; }
+  .landing-art::before { width: 72vw; }
+  .landing-art img { max-height: 370px; }
+  .navBar { height: 68px; padding-inline: 14px; }
+  .navBar .smeet-brand { font-size: 1.2rem; }
+  .navBar .smeet-brand img { width: 32px; height: 32px; }
+  .nav-actions { gap: 0; }
+  .nav-actions .nav-history { font-size: .82rem; }
+  .nav-actions .nav-logout { font-size: .8rem; padding: 5px 11px; }
+  .meetContainer { width: min(100% - 32px, 540px); min-height: auto; grid-template-columns: 1fr; gap: 15px; padding: 46px 0 28px; }
+  .leftPanel h2 { font-size: 2.55rem; }
+  .rightPanel { min-height: 260px; padding: 16px; }
+  .rightPanel > img { width: min(75%, 300px); }
+  .home-points { gap: 10px 16px; }
+  .history-content { margin-top: 14px; }
+  .history-card .MuiCardContent-root { align-items: flex-start; flex-direction: column; gap: 7px; padding: 18px; }
+  .auth-mobile-brand { display: block; }
 }

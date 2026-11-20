@@ -77,8 +77,8 @@ const joinMeeting = async (userStream, peerId = 'peer') => {
             <Route path='/' element={<div />} />
         </Routes>
     </MemoryRouter>);
-    fireEvent.change(screen.getByLabelText('Username'), { target: { value: 'Guest' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Connect' }));
+    fireEvent.change(screen.getByLabelText('Your name'), { target: { value: 'Guest' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Join meeting' }));
     await screen.findByRole('button', { name: 'Turn camera off' });
     await screen.findByRole('button', { name: 'Start screen sharing' });
     socket.trigger('connect');
@@ -126,6 +126,18 @@ test('WebRTC answers offers and applies ICE candidates that arrived early', asyn
     await waitFor(() => expect(socket.emit).toHaveBeenCalledWith('signal', '0-peer', {
         description: { type: 'answer', sdp: 'answer' },
     }));
+});
+
+test('video call chat displays incoming room messages and sends composed messages', async () => {
+    const { socket } = await joinMeeting(makeStream(makeTrack('video'), makeTrack('audio')));
+
+    act(() => socket.trigger('chat-message', 'Hello from the room', 'Another guest', 'peer'));
+    expect(await screen.findByText('Hello from the room')).toBeInTheDocument();
+    expect(screen.getByText('Another guest')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText('Write a message'), { target: { value: 'Hi there' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Send' }));
+    expect(socket.emit).toHaveBeenCalledWith('chat-message', 'Hi there', 'Guest');
 });
 
 test('screen audio uses a separate sender and both stop paths restore camera and microphone', async () => {

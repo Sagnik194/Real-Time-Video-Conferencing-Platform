@@ -13,6 +13,7 @@ import ChatIcon from '@mui/icons-material/Chat';
 import styles from '../styles/videoComponent.module.css';
 import server from '../environment';
 import { getIceServers } from '../utils/iceServers';
+import Brand from '../components/Brand';
 
 export default function VideoMeetComponent() {
     const { url: roomId = '' } = useParams();
@@ -226,18 +227,28 @@ export default function VideoMeetComponent() {
     };
     const endCall = () => { cleanup(); navigate('/'); };
 
-    return <div>{!joined ? <div>
-        <h2>Enter into Lobby</h2>
-        <TextField label="Username" value={username} onChange={e => setUsername(e.target.value)} onKeyDown={e => e.key === 'Enter' && join()} />
-        <Button variant="contained" onClick={join}>Connect</Button>
-        <p role="alert">{error}</p>
-        <video ref={localVideoRef} autoPlay muted playsInline />
-    </div> : <div className={styles.meetVideoContainer}>
+    return <div>{!joined ? <main className={styles.lobbyPage}>
+        <section className={styles.lobbyCard}>
+            <div className={styles.lobbyForm}>
+                <Brand large />
+                <h1>Join the conversation.</h1>
+                <p>Enter your name to step into this Smeet room.</p>
+                <TextField label="Your name" value={username} onChange={e => setUsername(e.target.value)} onKeyDown={e => e.key === 'Enter' && join()} />
+                <Button variant="contained" onClick={join}>Join meeting</Button>
+                {error && <p role="alert">{error}</p>}
+            </div>
+            <div className={styles.lobbyPreview}>
+                <p>Room preview</p>
+                <video ref={localVideoRef} autoPlay muted playsInline />
+            </div>
+        </section>
+    </main> : <div className={styles.meetVideoContainer}>
+        <header className={styles.meetingHeader}><Brand /><span className={styles.roomBadge}>Room · {roomId}</span></header>
         {chatOpen && <div className={styles.chatRoom}><div className={styles.chatContainer}>
-            <h1>Chat</h1><div className={styles.chattingDisplay}>
-                {messages.length ? messages.map((item, index) => <div style={{ marginBottom: 20 }} key={index}><p style={{ fontWeight: 'bold' }}>{item.sender}</p><p>{item.data}</p></div>) : <p>No Messages Yet</p>}
+            <div className={styles.chatTitle}><h1>Meeting chat</h1><span>{messages.length} messages</span></div><div className={styles.chattingDisplay}>
+                {messages.length ? messages.map((item, index) => <div className={styles.chatMessage} key={index}><strong>{item.sender}</strong><p>{item.data}</p></div>) : <p className={styles.chatEmpty}>No messages yet. Say hello to the room.</p>}
             </div><div className={styles.chattingArea}>
-                <TextField value={message} onChange={e => setMessage(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendMessage()} label="Enter Your chat" />
+                <TextField value={message} onChange={e => setMessage(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendMessage()} label="Write a message" />
                 <Button variant="contained" onClick={sendMessage}>Send</Button>
             </div>
         </div></div>}
@@ -246,9 +257,9 @@ export default function VideoMeetComponent() {
             <IconButton aria-label="End call" onClick={endCall} style={{ color: 'red' }}><CallEndIcon /></IconButton>
             <IconButton aria-label={audioOn ? 'Mute microphone' : 'Unmute microphone'} onClick={toggleAudio} style={{ color: 'white' }}>{audioOn ? <MicIcon /> : <MicOffIcon />}</IconButton>
             {screenAvailable && <IconButton aria-label={screenOn ? 'Stop screen sharing' : 'Start screen sharing'} onClick={toggleScreen} style={{ color: 'white' }}>{screenOn ? <StopScreenShareIcon /> : <ScreenShareIcon />}</IconButton>}
-            <Badge badgeContent={newMessages} max={999} color="warning"><IconButton onClick={() => { setChatOpen(open => !open); setNewMessages(0); }} style={{ color: 'white' }}><ChatIcon /></IconButton></Badge>
+            <Badge badgeContent={newMessages} max={999} color="error"><IconButton aria-label={chatOpen ? 'Hide chat' : 'Show chat'} onClick={() => { setChatOpen(open => !open); setNewMessages(0); }} style={{ color: 'white' }}><ChatIcon /></IconButton></Badge>
         </div>
-        <p role="alert">{error}</p>
+        {error && <p className={styles.meetingError} role="alert">{error}</p>}
         <video className={styles.meetUserVideo} ref={localVideoRef} autoPlay muted playsInline />
         <div className={styles.conferenceView}>{videos.map(video => <div key={video.socketId}><video ref={ref => { if (ref && ref.srcObject !== video.stream) ref.srcObject = video.stream; }} autoPlay playsInline /></div>)}</div>
     </div>}</div>;

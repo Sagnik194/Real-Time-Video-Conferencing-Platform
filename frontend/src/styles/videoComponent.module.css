@@ -15,6 +15,7 @@
 .meetingHeader .smeet-brand img { width: 30px; height: 30px; }
 .roomBadge { padding: 7px 12px; border: 1px solid #ffffff2c; border-radius: 999px; color: #eee; background: #ffffff12; font-size: .78rem; }
 .meetUserVideo { position: absolute; z-index: 1; bottom: 100px; right: 24px; width: clamp(130px, 18vw, 250px); aspect-ratio: 4/3; object-fit: cover; border: 2px solid #ffffffd9; border-radius: 15px; background: #282828; box-shadow: 0 8px 25px #0007; }
+.meetUserVideoChatOpen { right: auto; left: 24px; }
 .conferenceView { position: absolute; inset: 72px 0 92px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 14px; padding: 16px 24px; overflow: auto; }
 .conferenceView > div { flex: 1 1 42%; min-width: min(300px, 90vw); max-width: 720px; }
 .conferenceView video { display: block; width: 100%; max-height: calc(100vh - 160px); aspect-ratio: 16/9; border-radius: 18px; background: #2a2a2a; object-fit: cover; }
@@ -48,6 +49,7 @@
   .lobbyPreview { padding: 20px; }
   .lobbyPreview video { width: min(100%, 310px); }
   .meetUserVideo { right: 12px; bottom: 88px; width: 118px; border-radius: 11px; }
+  .meetUserVideoChatOpen { right: auto; left: 12px; }
   .conferenceView { inset: 60px 0 82px; padding: 10px; }
   .conferenceView > div { flex-basis: 100%; min-width: 0; }
   .conferenceView video { max-height: calc(100vh - 190px); border-radius: 13px; }

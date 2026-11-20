@@ -295,7 +295,7 @@ export default function VideoMeetComponent() {
             <Badge badgeContent={newMessages} max={999} color="error"><IconButton aria-label={chatOpen ? 'Hide chat' : 'Show chat'} onClick={() => { setChatOpen(open => !open); setNewMessages(0); }} style={{ color: 'white' }}><ChatIcon /></IconButton></Badge>
         </div>
         {error && <p className={styles.meetingError} role="alert">{error}</p>}
-        <video className={styles.meetUserVideo} ref={attachLocalVideo} autoPlay muted playsInline />
+        <video className={`${styles.meetUserVideo} ${chatOpen ? styles.meetUserVideoChatOpen : ''}`} ref={attachLocalVideo} autoPlay muted playsInline />
         <div className={styles.conferenceView}>{videos.map(video => <div key={video.socketId}><video ref={ref => { if (ref && ref.srcObject !== video.stream) ref.srcObject = video.stream; }} autoPlay playsInline /></div>)}</div>
     </div>}</div>;
 }

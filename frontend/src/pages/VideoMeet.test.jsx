@@ -128,6 +128,19 @@ test('camera and microphone toggles change only their own tracks', async () => {
     expect(pc.getSenders().find(sender => sender.track?.kind === 'video').track).toBe(camera);
 });
 
+test('joined self-view stays visible beside the open chat panel', async () => {
+    const localStream = makeStream(makeTrack('video'), makeTrack('audio'));
+    await joinMeeting(localStream);
+
+    const selfView = document.querySelector('.meetUserVideo');
+    expect(selfView).toBeInTheDocument();
+    expect(selfView.srcObject).toBe(localStream);
+    expect(selfView.className).toContain('meetUserVideoChatOpen');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Hide chat' }));
+    expect(selfView.className).not.toContain('meetUserVideoChatOpen');
+});
+
 test('WebRTC answers offers and applies ICE candidates that arrived early', async () => {
     const { socket, pc } = await joinMeeting(makeStream(makeTrack('video'), makeTrack('audio')), '0-peer');
     const candidate = { candidate: 'candidate:early' };

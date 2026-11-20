@@ -11,12 +11,19 @@ function HomeComponent() {
 
     let navigate = useNavigate();
     const [meetingCode, setMeetingCode] = useState("");
+    const [error, setError] = useState("");
 
 
     const {addToUserHistory} = useContext(AuthContext);
     let handleJoinVideoCall = async () => {
-        await addToUserHistory(meetingCode)
-        navigate(`/${meetingCode}`)
+        const code = meetingCode.trim();
+        if (!code) { setError("Enter a meeting code to join."); return; }
+        try {
+            await addToUserHistory(code);
+            navigate(`/${encodeURIComponent(code)}`);
+        } catch (e) {
+            setError(e.response?.data?.message || "Unable to save meeting history. Please sign in again.");
+        }
     }
 
     return (
@@ -58,10 +65,11 @@ function HomeComponent() {
 
                         <div style={{ display: 'flex', gap: "10px" }}>
 
-                            <TextField onChange={e => setMeetingCode(e.target.value)} id="outlined-basic" label="Meeting Code" variant="outlined" />
+                            <TextField value={meetingCode} onChange={e => { setMeetingCode(e.target.value); setError(""); }} onKeyDown={e => e.key === "Enter" && handleJoinVideoCall()} id="outlined-basic" label="Meeting Code" variant="outlined" />
                             <Button onClick={handleJoinVideoCall} variant='contained'>Join</Button>
 
                         </div>
+                        {error && <p role="alert">{error}</p>}
                     </div>
                 </div>
                 <div className='rightPanel'>

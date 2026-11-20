@@ -1,120 +1,50 @@
-import { Server } from "socket.io"
+import { Server } from 'socket.io';
 
-
-let connections = {}
-let messages = {}
-let timeOnline = {}
+const MAX_MESSAGE_LENGTH = 2000;
+const MAX_ROOM_MESSAGES = 200;
 
 export const connectToSocket = (server) => {
+    const defaultOrigins = ['https://real-time-video-conferencing-platform-de4t.onrender.com', 'http://localhost:3000'];
+    const allowedOrigins = (process.env.CLIENT_ORIGIN || defaultOrigins.join(',')).split(',').map(value => value.trim()).filter(Boolean);
     const io = new Server(server, {
-        cors: {
-            origin: "*",
-            methods: ["GET", "POST"],
-            allowedHeaders: ["*"],
-            credentials: true
-        }
+        cors: { origin: allowedOrigins, methods: ['GET', 'POST'] },
+        maxHttpBufferSize: 1e6,
     });
+    const roomMessages = new Map();
 
-
-    io.on("connection", (socket) => {
-
-        console.log("SOMETHING CONNECTED")
-
-        socket.on("join-call", (path) => {
-
-            if (connections[path] === undefined) {
-                connections[path] = []
+    io.on('connection', socket => {
+        let currentRoom = null;
+        socket.on('join-call', rawRoom => {
+            const room = typeof rawRoom === 'string' ? rawRoom.trim().slice(0, 128) : '';
+            if (!room) return socket.emit('meeting-error', 'Invalid meeting code.');
+            if (currentRoom) socket.leave(currentRoom);
+            currentRoom = room;
+            const clients = Array.from(io.sockets.adapter.rooms.get(room) || []);
+            socket.join(room);
+            for (const clientId of [...clients, socket.id]) io.to(clientId).emit('user-joined', socket.id, [...clients, socket.id]);
+            for (const item of roomMessages.get(room) || []) socket.emit('chat-message', item.data, item.sender, item.socketId);
+        });
+        socket.on('signal', (toId, payload) => {
+            if (!currentRoom || typeof toId !== 'string' || !payload || typeof payload !== 'object') return;
+            if (io.sockets.adapter.rooms.get(currentRoom)?.has(toId)) io.to(toId).emit('signal', socket.id, payload);
+        });
+        socket.on('chat-message', (rawText, rawSender) => {
+            if (!currentRoom || typeof rawText !== 'string') return;
+            const data = rawText.trim().slice(0, MAX_MESSAGE_LENGTH);
+            if (!data) return;
+            const sender = typeof rawSender === 'string' ? rawSender.trim().slice(0, 80) || 'Guest' : 'Guest';
+            const history = roomMessages.get(currentRoom) || [];
+            history.push({ data, sender, socketId: socket.id });
+            if (history.length > MAX_ROOM_MESSAGES) history.splice(0, history.length - MAX_ROOM_MESSAGES);
+            roomMessages.set(currentRoom, history);
+            io.to(currentRoom).emit('chat-message', data, sender, socket.id);
+        });
+        socket.on('disconnect', () => {
+            if (currentRoom) {
+                socket.to(currentRoom).emit('user-left', socket.id);
+                if (!(io.sockets.adapter.rooms.get(currentRoom)?.size)) roomMessages.delete(currentRoom);
             }
-            connections[path].push(socket.id)
-
-            timeOnline[socket.id] = new Date();
-
-            // connections[path].forEach(elem => {
-            //     io.to(elem)
-            // })
-
-            for (let a = 0; a < connections[path].length; a++) {
-                io.to(connections[path][a]).emit("user-joined", socket.id, connections[path])
-            }
-
-            if (messages[path] !== undefined) {
-                for (let a = 0; a < messages[path].length; ++a) {
-                    io.to(socket.id).emit("chat-message", messages[path][a]['data'],
-                        messages[path][a]['sender'], messages[path][a]['socket-id-sender'])
-                }
-            }
-
-        })
-
-        socket.on("signal", (toId, message) => {
-            io.to(toId).emit("signal", socket.id, message);
-        })
-
-        socket.on("chat-message", (data, sender) => {
-
-            const [matchingRoom, found] = Object.entries(connections)
-                .reduce(([room, isFound], [roomKey, roomValue]) => {
-
-
-                    if (!isFound && roomValue.includes(socket.id)) {
-                        return [roomKey, true];
-                    }
-
-                    return [room, isFound];
-
-                }, ['', false]);
-
-            if (found === true) {
-                if (messages[matchingRoom] === undefined) {
-                    messages[matchingRoom] = []
-                }
-
-                messages[matchingRoom].push({ 'sender': sender, "data": data, "socket-id-sender": socket.id })
-                console.log("message", matchingRoom, ":", sender, data)
-
-                connections[matchingRoom].forEach((elem) => {
-                    io.to(elem).emit("chat-message", data, sender, socket.id)
-                })
-            }
-
-        })
-
-        socket.on("disconnect", () => {
-
-            var diffTime = Math.abs(timeOnline[socket.id] - new Date())
-
-            var key
-
-            for (const [k, v] of JSON.parse(JSON.stringify(Object.entries(connections)))) {
-
-                for (let a = 0; a < v.length; ++a) {
-                    if (v[a] === socket.id) {
-                        key = k
-
-                        for (let a = 0; a < connections[key].length; ++a) {
-                            io.to(connections[key][a]).emit('user-left', socket.id)
-                        }
-
-                        var index = connections[key].indexOf(socket.id)
-
-                        connections[key].splice(index, 1)
-
-
-                        if (connections[key].length === 0) {
-                            delete connections[key]
-                        }
-                    }
-                }
-
-            }
-
-
-        })
-
-
-    })
-
-
+        });
+    });
     return io;
-}
-
+};

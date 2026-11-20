@@ -98,7 +98,7 @@ video-conferencing-platform/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/video-conferencing-platform.git
+git clone https://github.com/Sagnik194/Real-Time-Video-Conferencing-Platform.git
 ```
 
 ### 2. Navigate to the Project
@@ -125,15 +125,15 @@ npm install
 
 ## 🔑 Environment Variables
 
-Create a `.env` file inside the **backend** folder.
+Create a `.env` file inside `backend/` before starting the API:
 
 ```env
 PORT=8000
-
-MONGODB_URI=your_mongodb_connection_string
-
-JWT_SECRET=your_jwt_secret
+MONGO_URI=your_mongodb_connection_string
+CLIENT_ORIGIN=http://localhost:3000,https://your-frontend.onrender.com
 ```
+
+`CLIENT_ORIGIN` is a comma-separated list of allowed frontend origins. The frontend uses `http://localhost:8000` in development and the configured Render API in production. Set `REACT_APP_SERVER_URL` at frontend build time to use a different API URL.
 
 ---
 
@@ -159,6 +159,10 @@ The application will be available at:
 Frontend: http://localhost:3000
 Backend : http://localhost:8000
 ```
+
+## 🚀 Deployment
+
+Deploy `backend/` as a Node service and `frontend/` as a static React site. Set `MONGO_URI` and `CLIENT_ORIGIN` on the backend service. Set `REACT_APP_SERVER_URL` to the public backend URL on the frontend build service, then rebuild the frontend. The backend exposes `GET /health` for service health checks. Both the website and API must use HTTPS in production for camera, microphone, and screen capture permissions to work.
 
 ---
 

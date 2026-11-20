@@ -60,7 +60,7 @@ export default function Authentication() {
         } catch (err) {
 
             console.log(err);
-            let message = (err.response.data.message);
+            let message = err.response?.data?.message || "Unable to complete the request. Please try again.";
             setError(message);
         }
     }

@@ -97,7 +97,9 @@ beforeEach(() => {
 test('camera and microphone toggles change only their own tracks', async () => {
     const camera = makeTrack('video');
     const microphone = makeTrack('audio');
-    const { pc } = await joinMeeting(makeStream(camera, microphone));
+    const localStream = makeStream(camera, microphone);
+    const { pc } = await joinMeeting(localStream);
+    expect(document.querySelector('video').srcObject).toBe(localStream);
 
     fireEvent.click(screen.getByRole('button', { name: 'Turn camera off' }));
     expect(camera.enabled).toBe(false);
@@ -161,6 +163,7 @@ test('screen audio uses a separate sender and both stop paths restore camera and
     fireEvent.click(screen.getByRole('button', { name: 'Start screen sharing' }));
     await screen.findByRole('button', { name: 'Stop screen sharing' });
     expect(navigator.mediaDevices.getDisplayMedia).toHaveBeenCalledWith({ video: true, audio: true });
+    expect(document.querySelector('video').srcObject).toBe(displayStream);
     const videoSender = pc.getTransceivers().find(item => item.receiver.track.kind === 'video').sender;
     const micSender = pc.getSenders().find(sender => sender.track === microphone);
     const screenAudioSender = pc.getSenders().find(sender => sender.track === displayAudio);

@@ -134,7 +134,7 @@ CLIENT_ORIGIN=http://localhost:3000,https://your-frontend.onrender.com
 SESSION_TTL_HOURS=24
 ```
 
-`CLIENT_ORIGIN` is a comma-separated list of allowed frontend origins. `SESSION_TTL_HOURS` defaults to 24 and is capped at 720 hours. The frontend uses `http://localhost:8000` in development and the configured Render API in production. Set `REACT_APP_SERVER_URL` at frontend build time to use a different API URL.
+`CLIENT_ORIGIN` is a comma-separated list of allowed frontend origins. `SESSION_TTL_HOURS` defaults to 24 and is capped at 720 hours. The frontend defaults to the deployed Render API in both development and production, so no frontend API variable is required for the hosted app. Set `REACT_APP_SERVER_URL=http://localhost:8000` in a frontend `.env.local` file when running a local backend, or set it to another API URL at build time.
 
 Login and registration have per-IP limits stored in the backend process. If you run multiple backend instances, use a shared rate-limit store or each instance will enforce its own counter.
 

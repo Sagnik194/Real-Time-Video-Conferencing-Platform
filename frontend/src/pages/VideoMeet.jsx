@@ -20,6 +20,10 @@ export default function VideoMeetComponent() {
     const navigate = useNavigate();
     const socketRef = useRef(null);
     const localVideoRef = useRef(null);
+    const attachLocalVideo = useCallback(node => {
+        localVideoRef.current = node;
+        if (node) node.srcObject = screenStreamRef.current || localStreamRef.current;
+    }, []);
     const localStreamRef = useRef(null);
     const screenStreamRef = useRef(null);
     const peersRef = useRef(new Map());
@@ -239,7 +243,7 @@ export default function VideoMeetComponent() {
             </div>
             <div className={styles.lobbyPreview}>
                 <p>Room preview</p>
-                <video ref={localVideoRef} autoPlay muted playsInline />
+                <video ref={attachLocalVideo} autoPlay muted playsInline />
             </div>
         </section>
     </main> : <div className={styles.meetVideoContainer}>
@@ -260,7 +264,7 @@ export default function VideoMeetComponent() {
             <Badge badgeContent={newMessages} max={999} color="error"><IconButton aria-label={chatOpen ? 'Hide chat' : 'Show chat'} onClick={() => { setChatOpen(open => !open); setNewMessages(0); }} style={{ color: 'white' }}><ChatIcon /></IconButton></Badge>
         </div>
         {error && <p className={styles.meetingError} role="alert">{error}</p>}
-        <video className={styles.meetUserVideo} ref={localVideoRef} autoPlay muted playsInline />
+        <video className={styles.meetUserVideo} ref={attachLocalVideo} autoPlay muted playsInline />
         <div className={styles.conferenceView}>{videos.map(video => <div key={video.socketId}><video ref={ref => { if (ref && ref.srcObject !== video.stream) ref.srcObject = video.stream; }} autoPlay playsInline /></div>)}</div>
     </div>}</div>;
 }

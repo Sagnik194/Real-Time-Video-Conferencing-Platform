@@ -1,8 +1,5 @@
-const server = process.env.REACT_APP_SERVER_URL || (
-    process.env.NODE_ENV === 'production'
-        ? 'https://real-time-video-conferencing-platform-1.onrender.com'
-        : 'http://localhost:8000'
-);
+const defaultServer = 'https://real-time-video-conferencing-platform-1.onrender.com';
+const server = (process.env.REACT_APP_SERVER_URL || defaultServer).replace(/\/+$/, '');
 
 
 export default server;

@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import HomeIcon from '@mui/icons-material/Home';
 
 import { IconButton } from '@mui/material';
+import Brand from '../components/Brand';
 export default function History() {
 
 
@@ -42,44 +43,21 @@ export default function History() {
     }
 
     return (
-        <div>
-
-            <IconButton onClick={() => {
-                routeTo("/home")
-            }}>
-                <HomeIcon />
-            </IconButton >
-            {
-                (meetings.length !== 0) ? meetings.map((e, i) => {
-                    return (
-
-                        <>
-
-
-                            <Card key={i} variant="outlined">
-
-
-                                <CardContent>
-                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                        Code: {e.meetingCode}
-                                    </Typography>
-
-                                    <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                                        Date: {formatDate(e.date)}
-                                    </Typography>
-
-                                </CardContent>
-
-
-                            </Card>
-
-
-                        </>
-                    )
-                }) : <></>
-
-            }
-
-        </div>
+        <main className="history-page">
+            <header className="history-header">
+                <IconButton aria-label="Back to Smeet home" onClick={() => routeTo("/home")}><HomeIcon /></IconButton>
+                <Brand />
+            </header>
+            <section className="history-content">
+                <h1>Meeting history</h1>
+                <p className="history-intro">Your recent rooms are kept here for a quick return.</p>
+                {meetings.length ? <div className="history-list">{meetings.map((meeting, index) => <Card key={meeting._id || `${meeting.meetingCode}-${index}`} className="history-card" variant="outlined">
+                    <CardContent>
+                        <Typography className="history-code" variant="body1">Room code · {meeting.meetingCode}</Typography>
+                        <Typography className="history-date" variant="body2">{formatDate(meeting.date)}</Typography>
+                    </CardContent>
+                </Card>)}</div> : <div className="history-empty">No meetings yet. Join a room and your recent meetings will appear here.</div>}
+            </section>
+        </main>
     )
 }

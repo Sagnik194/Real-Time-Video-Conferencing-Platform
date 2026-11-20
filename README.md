@@ -8,7 +8,7 @@ A full-stack real-time video conferencing application inspired by Zoom, built us
 
 ## 🚀 Features
 
-- 🔐 User Authentication & Authorization using JWT
+- 🔐 User Authentication & Authorization using expiring bearer-token sessions
 - 📹 Create and Join Video Meetings
 - 🎙️ Real-Time Audio & Video Communication
 - 💬 Real-Time Chat Messaging
@@ -45,7 +45,7 @@ A full-stack real-time video conferencing application inspired by Zoom, built us
 - STUN Server
 
 ### Authentication & Security
-- JWT (JSON Web Token)
+- Expiring random bearer tokens
 - bcrypt.js
 - CORS
 
@@ -98,7 +98,7 @@ video-conferencing-platform/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/video-conferencing-platform.git
+git clone https://github.com/Sagnik194/Real-Time-Video-Conferencing-Platform.git
 ```
 
 ### 2. Navigate to the Project
@@ -125,15 +125,29 @@ npm install
 
 ## 🔑 Environment Variables
 
-Create a `.env` file inside the **backend** folder.
+Create a `.env` file inside `backend/` before starting the API:
 
 ```env
 PORT=8000
-
-MONGODB_URI=your_mongodb_connection_string
-
-JWT_SECRET=your_jwt_secret
+MONGO_URI=your_mongodb_connection_string
+CLIENT_ORIGIN=http://localhost:3000,https://your-frontend.onrender.com
+SESSION_TTL_HOURS=24
 ```
+
+`CLIENT_ORIGIN` is a comma-separated list of allowed frontend origins. `SESSION_TTL_HOURS` defaults to 24 and is capped at 720 hours. The frontend uses `http://localhost:8000` in development and the configured Render API in production. Set `REACT_APP_SERVER_URL` at frontend build time to use a different API URL.
+
+Login and registration have per-IP limits stored in the backend process. If you run multiple backend instances, use a shared rate-limit store or each instance will enforce its own counter.
+
+For TURN-enabled WebRTC, set these variables on the Render frontend service before building:
+
+```env
+REACT_APP_STUN_URLS=stun:stun.l.google.com:19302
+REACT_APP_TURN_URLS=turn:relay.example.com:3478?transport=udp,turns:relay.example.com:5349
+REACT_APP_TURN_USERNAME=short_lived_turn_username
+REACT_APP_TURN_CREDENTIAL=short_lived_turn_credential
+```
+
+STUN remains enabled as a fallback when TURN is configured. `REACT_APP_*` values are embedded in the public frontend bundle, so use short-lived, restricted TURN credentials from your provider and rotate them; do not put long-lived provider secrets there.
 
 ---
 
@@ -159,6 +173,10 @@ The application will be available at:
 Frontend: http://localhost:3000
 Backend : http://localhost:8000
 ```
+
+## 🚀 Deployment
+
+Deploy `backend/` as a Node service and `frontend/` as a static React site. Set `MONGO_URI`, `CLIENT_ORIGIN`, and optionally `SESSION_TTL_HOURS` on the backend service. Set `REACT_APP_SERVER_URL` and, if using TURN, the `REACT_APP_TURN_*` variables on the frontend build service, then rebuild the frontend. The backend exposes `GET /health` for service health checks. Both the website and API must use HTTPS in production for camera, microphone, and screen capture permissions to work.
 
 ---
 
@@ -222,7 +240,7 @@ This project helped me gain practical experience in:
 - Building scalable MERN Stack applications
 - Implementing real-time communication with Socket.IO
 - Establishing peer-to-peer connections using WebRTC
-- Managing secure authentication and authorization with JWT
+- Managing expiring bearer-token authentication and authorization
 - Designing RESTful APIs using Express.js
 - Integrating MongoDB with Mongoose
 - Handling real-time signaling and event-driven architecture

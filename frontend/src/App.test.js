@@ -1,8 +1,19 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+jest.mock('axios', () => ({
+  __esModule: true,
+  default: {
+    create: () => ({
+      interceptors: { request: { use: jest.fn() } },
+      get: jest.fn(),
+      post: jest.fn(),
+    }),
+  },
+}));
+
+test('renders the video conferencing landing page', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  expect(screen.getByText(/connect/i)).toBeInTheDocument();
+  expect(screen.getByText(/get started/i)).toBeInTheDocument();
 });

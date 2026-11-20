@@ -52,10 +52,22 @@
 .chatContainer {
     position: relative;
     height: 100%;
+    padding-bottom: 64px;
+}
+
+.chattingDisplay {
+    max-height: calc(80vh - 120px);
+    overflow-y: auto;
+    padding-top: 10px;
 }
 
 
 .chattingArea {
     position: absolute;
     bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    gap: 8px;
+    background: white;
 }
